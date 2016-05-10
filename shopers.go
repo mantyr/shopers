@@ -12,9 +12,9 @@ func NewShopers() (s *Shopers) {
 }
 
 // Заменяет названия категорий на те что указаны в конфиге по следующему принципу:
-// 1. Вначале текущая цепочка категорий
-// 2. Потом по уменьшению до корневой
-// 3. Потом в категории default
+//  1. Вначале текущая цепочка категорий
+//  2. Потом по уменьшению до корневой
+//  3. Потом в категории default
 func (s *Shopers) Get(categories []string) (result []string) {
     result = make([]string, len(categories))
     var key_category string
