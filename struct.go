@@ -5,6 +5,7 @@ import (
 )
 
 type Shopers struct {
-    conf_file conf.ConfigFile
+    conf_file  conf.ConfigFile
+    conf_group conf.ConfigFile
     is_uc_first bool
 }

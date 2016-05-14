@@ -64,6 +64,36 @@ func (s *Shopers) Get(categories []string) (result []string) {
     return result
 }
 
+func (s *Shopers) GetGroup(categories []string) (result []string) {
+    var key_category       string
+    var key_category_arr []string
+    var key_category_group string
+
+    for _, category := range categories {
+        category = runner.Trim(category)
+        key_category = strings.ToLower(category)
+
+        key_category_arr   = append(key_category_arr, key_category)
+        key_category_group = strings.Join(key_category_arr, " | ")
+
+        if s.conf_group.Is(key_category_group) {
+            arr := strings.Split(s.conf_group.Get(key_category_group), " | ")
+            result = []string{}
+            for _, arr_item := range arr {
+                arr_item = runner.Trim(arr_item)
+                result = append(result, arr_item)
+            }
+        } else {
+            if s.is_uc_first {
+                category = runner.UcFirst(category)
+            }
+            result = append(result, category)
+        }
+    }
+
+    return
+}
+
 // Нужно ли делать первую букву исходного названия категории большой (заменяемые из конфига не модифицируются)
 func (s *Shopers) IsUcFirst(status bool) {
     s.is_uc_first = status
@@ -71,5 +101,10 @@ func (s *Shopers) IsUcFirst(status bool) {
 
 func (s *Shopers) LoadConf(name string) *Shopers {
     s.conf_file = conf.GetFile(name)
+    return s
+}
+
+func (s *Shopers) LoadConfGroup(name string) *Shopers {
+    s.conf_group = conf.GetFile(name)
     return s
 }
