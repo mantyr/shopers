@@ -16,36 +16,47 @@ func NewShopers() (s *Shopers) {
 //  2. Потом по уменьшению до корневой
 //  3. Потом в категории default
 func (s *Shopers) Get(categories []string) (result []string) {
-    result = make([]string, len(categories))
-    var key_category string
+    var key_category  string
+    var key_value_old string
     var is bool
 
     for key, category := range categories {
-        key_category = strings.ToLower(runner.Trim(category))
+        category = runner.Trim(category)
+        key_category = strings.ToLower(category)
 
         if s.is_uc_first {
-            result[key] = runner.UcFirst(category)
+            key_value_old = runner.UcFirst(category)
         } else {
-            result[key] = category
+            key_value_old = category
         }
 
-        if key == 0 {
-            if s.conf_file.Is(key_category, "default") {
-                result[key] = s.conf_file.Get(key_category, "default")
-            }
-        } else {
-            is = false
-            for i := key-1; i >= 0; i-- {
+        is = false
+
+        if key > 0 {
+            for i := len(result)-1; i >= 0; i-- {
                 section_replace := strings.ToLower("category: \""+strings.Join(result[0:i+1], "\" \"")+"\"")
 
                 if s.conf_file.Is(key_category, section_replace) {
-                    result[key] = s.conf_file.Get(key_category, section_replace)
+                    arr := strings.Split(s.conf_file.Get(key_category, section_replace), " | ")
+                    for _, arr_item := range arr {
+                        arr_item = runner.Trim(arr_item)
+                        result = append(result, arr_item)
+                    }
                     is = true
                     break;
                 }
             }
-            if !is && s.conf_file.Is(key_category, "default") {
-                result[key] = s.conf_file.Get(key_category, "default")
+        }
+
+        if !is {
+            if s.conf_file.Is(key_category, "default") {
+                arr := strings.Split(s.conf_file.Get(key_category, "default"), " | ")
+                for _, arr_item := range arr {
+                    arr_item = runner.Trim(arr_item)
+                    result = append(result, arr_item)
+                }
+            } else {
+                result = append(result, key_value_old)
             }
         }
     }
